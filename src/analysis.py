@@ -1,4 +1,5 @@
 import re
+from enum import StrEnum
 
 critical_patterns = [
     re.compile(r".*API_KEY$", re.IGNORECASE),
@@ -19,50 +20,58 @@ sensitive_patterns = [
 ]
 
 noise_patterns = [
-    re.compile(r"^VITE.*", re.IGNORECASE),
+    # re.compile(r"^VITE.*", re.IGNORECASE),
     re.compile(r"^NODE.*", re.IGNORECASE),
     re.compile(r".*PORT$", re.IGNORECASE),
     re.compile(r".*HOST$", re.IGNORECASE),
     re.compile(r" *", re.IGNORECASE)
 ]
 
-def classify_env_key(key: str):
+
+class Severity(StrEnum):
+    CRITICAL = "critical"
+    SENSITIVE = "sensitive"
+    NOISE = "noise"
+    UNKNOWN = "unknown"
+
+
+def classify_env_key(key: str) -> Severity:
     key = key.strip().upper()
 
     for pattern in critical_patterns:
         if pattern.match(key):
-            return "critical"
+            return Severity.CRITICAL
     for pattern in sensitive_patterns:
         if pattern.match(key):
-            return "sensitive"
+            return Severity.SENSITIVE
     for pattern in noise_patterns:
         if pattern.match(key):
-            return "noise"
+            return Severity.NOISE
 
-    return "unknown"
+    return Severity.UNKNOWN
+
 
 def analyze_env_file(content: str):
     result = []
 
-    for line in content.split("\n"):
+    for line in content.splitlines():
         line = line.strip()
 
-        if not len(line): continue
-
+        if not line: continue
         if line.startswith("#"): continue
         if "=" not in line: continue
 
-        key, value = line.split("=", 1)
+        k, v = line.split("=", 1)
 
-        key = key.strip().upper()
-        value = value.strip()
+        k = k.strip().upper()
+        v = v.strip()
 
-        if not value: continue
+        if not v: continue
 
         result.append({
-            "severity": classify_env_key(key),
-            "key": key,
-            "value": value
+            "severity": classify_env_key(k),
+            "key": k,
+            "value": v
         })
 
     return result
