@@ -25,7 +25,6 @@ def search_repos(query: str, page: int = 1, per_page: int = 100):
 
 def get_files(repo_name) -> list[dict]:
     resp = requests.get(f"https://api.github.com/repos/{repo_name}", headers=HEADERS)
-    print(resp.json().get("html_url"))
     if not resp.ok:
         return []
 
