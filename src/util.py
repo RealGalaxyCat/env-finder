@@ -10,9 +10,12 @@ from analysis import analyze_env_file
 
 TIMESTAMP_FOREGROUND_COLOR = Fore.WHITE
 
-HITS_FILE = Path(__file__).parent.parent / "data" / "hits.json"
-SECRETS_FILE = Path(__file__).parent.parent / "data" / "secrets.json"
+BASE = Path(__file__).parent.parent
+DATA_DIR = BASE / "data"
+HITS_FILE = DATA_DIR / "hits.json"
+SECRETS_FILE = DATA_DIR / "secrets.json"
 
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 if not HITS_FILE.exists():
     print("Hits file doesn't exist, creating...")
     HITS_FILE.touch()
