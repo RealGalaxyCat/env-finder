@@ -4,8 +4,7 @@ import time
 import signal
 
 from github import get_files, search_repos
-from util import log, LogLevel, add_hits_entry, add_secrets_entry
-
+from util import log, LogLevel, add_hits_entry, add_secrets_entry, ActionType
 
 REPO_BATCH_SIZE = 100
 
@@ -25,7 +24,7 @@ class Scraper:
 
     def handle_stop_signals(self, *_):
         self.running = False
-        log("Received shutdown signal, shutting down...", LogLevel.INFO)
+        log("Received shutdown signal, shutting down...", ActionType.INFO, LogLevel.STATUS)
 
 
     def start(self):
@@ -42,26 +41,26 @@ class Scraper:
                      f"language:Python "
                      f" created:{from_.strftime("%Y-%m-%dT%H:%M:%SZ")}..{to.strftime("%Y-%m-%dT%H:%M:%SZ")}")
 
-            log(f"[GITHUB] Querying '{query}'")
+            log(f"[GITHUB] Querying '{query}'", ActionType.INFO, LogLevel.INFO)
 
 
 
             repos = search_repos(query, per_page=1)  # only 1, because we don't care about the actual repos just yet
             if not repos:
-                log("Error while searching for repos", LogLevel.ERROR)
-                log(f"Repos scraped: {self.repos_scraped} - Secrets: {self.secrets_count} - Errors: {self.errors_count} ", LogLevel.STATS)
+                log("Error while searching for repos", ActionType.ERROR, LogLevel.ERROR)
+                log(f"Repos scraped: {self.repos_scraped} - Secrets: {self.secrets_count} - Errors: {self.errors_count} ", ActionType.INFO, LogLevel.STATS)
                 break
 
             count = repos["total_count"]
 
-            log(f"[GITHUB] Found {count} matching repositories...")
+            log(f"[GITHUB] Found {count} matching repositories...", ActionType.INFO, LogLevel.INFO)
 
             # Split into chunks of 100 results each, because the Github API only allows up to 100 results per request
             for p in range(1, ceil(count/REPO_BATCH_SIZE) + 1):
                 if not self.running:
                     break
 
-                log(f"[GITHUB] Loading Page {p}/{ceil(count/REPO_BATCH_SIZE)}")
+                log(f"[GITHUB] Loading Page {p}/{ceil(count/REPO_BATCH_SIZE)}", ActionType.INFO, LogLevel.INFO)
                 repos = search_repos(query, p, REPO_BATCH_SIZE)["items"]
 
                 for repo in repos:
@@ -73,7 +72,7 @@ class Scraper:
                     language = repo.get("language")
 
                     if name in self.seen_repos:
-                        log(f"[{name}] [~] Repo was already searched, skipping")
+                        log(f"[{name}] Repo was already searched, skipping", ActionType.INFO, LogLevel.INFO)
                         time.sleep(0.3)
                         continue
 
@@ -81,11 +80,11 @@ class Scraper:
                     time.sleep(0.5)
 
 
-                    log(f"[{name}] [~] Scraping ...  ".ljust(70))
+                    log(f"[{name}] Scraping ...  ".ljust(70), ActionType.INFO, LogLevel.INFO)
 
                     files = get_files(name)
                     if not files:
-                        log(f"[{name}] [-] Failed to fetch Files", LogLevel.ERROR)
+                        log(f"[{name}] Failed to fetch Files", ActionType.ERROR, LogLevel.ERROR)
                         self.errors_count += 1
                         time.sleep(5)
                         continue
@@ -107,7 +106,7 @@ class Scraper:
                     self.secrets_count += len(secrets)
 
                     if not secrets:
-                        log(f"[{name}] [-] No secrets found")
+                        log(f"[{name}] No secrets found", ActionType.INFO, LogLevel.INFO)
                         continue
 
 
@@ -115,7 +114,7 @@ class Scraper:
                     add_secrets_entry(repo_name=name, branch=branch, secrets=secrets)
 
 
-            log(f"Repos scraped: {self.repos_scraped} - Secrets: {self.secrets_count} - Errors: {self.errors_count} - ", LogLevel.STATS)
+            log(f"Repos scraped: {self.repos_scraped} - Secrets: {self.secrets_count} - Errors: {self.errors_count} - ", ActionType.INFO, LogLevel.STATS)
 
 
 

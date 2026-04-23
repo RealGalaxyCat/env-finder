@@ -26,21 +26,50 @@ if not SECRETS_FILE.exists():
 
 
 
-class LogLevel(Enum):
-    INFO = ("info", Back.LIGHTCYAN_EX, Fore.BLACK)
-    ERROR = ("error", Back.RED, Fore.BLACK)
-    RESULTS = ("results", Back.YELLOW, Fore.BLACK)
-    STATS = ("stats", Back.LIGHTGREEN_EX, Fore.BLACK)
 
-    def __init__(self, name_: str, background_color: str, foreground_color: type[Fore]):
-        self.name_ = name_
+RESET = Style.RESET_ALL
+
+
+class LogLevel(Enum):
+    INFO    = ("info",    Back.CYAN,    Fore.BLACK)
+    ERROR   = ("error",   Back.RED,     Fore.WHITE)
+    RESULTS = ("results", Back.YELLOW, Fore.WHITE)
+    STATS   = ("stats",   Back.GREEN,   Fore.BLACK)
+    STATUS  = ("status",  Back.BLUE,    Fore.WHITE)
+
+    def __init__(self, name_: str, background_color: str, foreground_color: str):
+        self.name_ = name_.upper()
         self.bg_color = background_color
         self.fg_color = foreground_color
 
 
-def log(message: str, level: LogLevel = LogLevel.INFO, end="\n"):
+class ActionType(Enum):
+    SUCCESS = ("[+]", None,      Fore.GREEN)
+    ERROR   = ("[-]", Back.RED,  Fore.BLACK)
+    DEBUG   = ("[~]", None,      Fore.CYAN)
+    INFO    = ("[*]", None,      Fore.BLUE)
+    WARNING = ("[!]", None,      Fore.YELLOW)
+
+    def __init__(self, text: str, foreground_color: str, background_color: str):
+        self.text = text
+        self.fg = foreground_color
+        self.bg = background_color
+
+
+
+
+def log(message: str, at: ActionType, level: LogLevel = LogLevel.INFO, end="\n"):
     ts = f"{TIMESTAMP_FOREGROUND_COLOR}[{datetime.now().strftime("%H:%M:%S")}]{Fore.RESET}"
-    print(f"{ts} {level.bg_color}{level.fg_color}[{level.name_.ljust(10)}]{Style.RESET_ALL} {message}", end=end)
+    if not at:
+        action_text = ""
+    else:
+        action_text = at.text
+
+    level_bg = level.bg_color if level.bg_color else ""
+    level_fg = level.fg_color if level.fg_color else ""
+    at_bg = at.bg if at.bg else ""
+    at_fg = at.fg if at.fg else ""
+    print(f"{ts} {level_bg}{level_fg}[{level.name_.ljust(7)}]{RESET} {at_bg}{at_fg}{action_text}{RESET} {message}", end=end)
 
 
 
@@ -49,7 +78,7 @@ def add_hits_entry(repo_name: str, branch: str, language: str, secrets: list[dic
     with open(HITS_FILE, "r") as f:
         data = json.load(f)
 
-    log(f"[{repo_name}] [+] Found {len(secrets)} Secrets", LogLevel.RESULTS)
+    log(f"[{repo_name}] Found {len(secrets)} Secret(s)", ActionType.SUCCESS, LogLevel.RESULTS)
 
     for sec in secrets:
         path = sec["path"]
