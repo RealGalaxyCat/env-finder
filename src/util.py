@@ -10,10 +10,15 @@ from analysis import analyze_env_file
 
 TIMESTAMP_FOREGROUND_COLOR = Fore.WHITE
 
-BASE = Path(__file__).parent.parent
-DATA_DIR = BASE / "data"
+# BASE = Path(__file__).parent.parent
+# DATA_DIR = BASE / "data"
+# HITS_FILE = DATA_DIR / "hits.json"
+# SECRETS_FILE = DATA_DIR / "secrets.json"
+
+DATA_DIR = Path("/app/data")
 HITS_FILE = DATA_DIR / "hits.json"
 SECRETS_FILE = DATA_DIR / "secrets.json"
+
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 if not HITS_FILE.exists():
@@ -26,6 +31,18 @@ if not SECRETS_FILE.exists():
     SECRETS_FILE.touch()
     SECRETS_FILE.write_text("[]", encoding="utf-8")
 
+
+
+def write_atomic(path: Path, data: dict | list | str | bytes):
+    tmp = path.with_suffix(".tmp")
+    match data:
+        case dict() | list():
+            tmp.write_text(json.dumps(data))
+        case str():
+            tmp.write_text(data)
+        case bytes():
+            tmp.write_bytes(data)
+    tmp.rename(path)  # atomic on Linux/macOS, near-atomic on Windows
 
 
 
@@ -94,8 +111,7 @@ def add_hits_entry(repo_name: str, branch: str, language: str, secrets: list[dic
             "sha" : sec["sha"]
         })
 
-    with open(HITS_FILE, "w") as f:
-        json.dump(data, f, indent=4)
+    write_atomic(HITS_FILE, data)
 
 
 
@@ -119,6 +135,5 @@ def add_secrets_entry(repo_name: str, branch: str, secrets: list[dict]):
                 "value" : var.get("value")
             })
 
-    with open(SECRETS_FILE, "w") as f:
-        json.dump(data, f, indent=4)
+    write_atomic(SECRETS_FILE, data)
 
