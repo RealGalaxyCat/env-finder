@@ -2,9 +2,10 @@ from datetime import datetime, timezone, timedelta
 from math import ceil
 import time
 import signal
+from threading import Thread
 
 from github import get_files, search_repos
-from util import log, LogLevel, add_hits_entry, add_secrets_entry, ActionType
+from util import log, log_stats, LogLevel, ActionType, add_hits_entry, add_secrets_entry, add_stats_entry
 
 REPO_BATCH_SIZE = 100
 
@@ -27,8 +28,23 @@ class Scraper:
         log("Received shutdown signal, shutting down...", ActionType.INFO, LogLevel.STATUS)
 
 
+    def stats_loop(self):
+        while self.running:
+            ts = time.time()
+            add_stats_entry({
+                "timestamp": ts,
+                "repos_scraped": self.repos_scraped,
+                "secrets_count": self.secrets_count,
+                "errors_count": self.errors_count
+            })
+            print("Added stats entry")
+            time.sleep(8)
+
+
     def start(self):
         self.running = True
+        Thread(target=self.stats_loop).start()
+
         while self.running:
             now = datetime.now(timezone.utc)
 
@@ -48,7 +64,7 @@ class Scraper:
             repos = search_repos(query, per_page=1)  # only 1, because we don't care about the actual repos just yet
             if not repos:
                 log("Error while searching for repos", ActionType.ERROR, LogLevel.ERROR)
-                log(f"Repos scraped: {self.repos_scraped} - Secrets: {self.secrets_count} - Errors: {self.errors_count} ", ActionType.INFO, LogLevel.STATS)
+                log_stats(self.repos_scraped, self.secrets_count, self.errors_count)
                 break
 
             count = repos["total_count"]
@@ -114,7 +130,7 @@ class Scraper:
                     add_secrets_entry(repo_name=name, branch=branch, secrets=secrets)
 
 
-            log(f"Repos scraped: {self.repos_scraped} - Secrets: {self.secrets_count} - Errors: {self.errors_count} - ", ActionType.INFO, LogLevel.STATS)
+            log_stats(self.repos_scraped, self.secrets_count, self.errors_count)
 
 
 
