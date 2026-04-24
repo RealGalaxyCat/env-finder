@@ -2,8 +2,8 @@ from fastapi import FastAPI
 import uvicorn
 from threading import Thread
 
-from api.api import app
-from scraper import Scraper
+from env_finder.api.api import app
+from env_finder.scraper import Scraper
 
 API_PORT = 6768
 

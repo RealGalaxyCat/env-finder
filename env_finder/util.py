@@ -4,8 +4,8 @@ from enum import Enum
 from pathlib import Path
 from colorama import Fore, Back, Style
 
-from github import get_file_content
-from analysis import analyze_env_file
+from env_finder.github import get_file_content
+from env_finder.analysis import analyze_env_file
 
 
 TIMESTAMP_FOREGROUND_COLOR = Fore.WHITE

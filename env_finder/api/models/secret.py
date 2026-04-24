@@ -1,9 +1,6 @@
 from pydantic import BaseModel
 
-
-# temp class
-class Severity:
-    pass
+from env_finder.analysis import Severity
 
 
 class Secret(BaseModel):

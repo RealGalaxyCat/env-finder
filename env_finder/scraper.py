@@ -4,8 +4,9 @@ import time
 import signal
 from threading import Thread
 
-from github import get_files, search_repos
-from util import log, log_stats, LogLevel, ActionType, add_hits_entry, add_secrets_entry, add_stats_entry
+from env_finder.github import get_files, search_repos
+from env_finder.util import log, log_stats, LogLevel, ActionType, add_hits_entry, add_secrets_entry, add_stats_entry
+
 
 REPO_BATCH_SIZE = 100
 
