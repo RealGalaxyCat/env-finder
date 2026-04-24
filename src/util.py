@@ -18,6 +18,7 @@ TIMESTAMP_FOREGROUND_COLOR = Fore.WHITE
 DATA_DIR = Path("/app/data")
 HITS_FILE = DATA_DIR / "hits.json"
 SECRETS_FILE = DATA_DIR / "secrets.json"
+STATS_FILE = DATA_DIR / "stats.json"
 
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -30,6 +31,11 @@ if not SECRETS_FILE.exists():
     print("Secrets file doesn't exist, creating...")
     SECRETS_FILE.touch()
     SECRETS_FILE.write_text("[]", encoding="utf-8")
+
+if not STATS_FILE.exists():
+    print("Stats file doesn't exist, creating...")
+    STATS_FILE.touch()
+    STATS_FILE.write_text("[]", encoding="utf-8")
 
 
 
@@ -93,10 +99,13 @@ def log(message: str, at: ActionType, level: LogLevel = LogLevel.INFO, end="\n")
 
 
 
+def log_stats(repos_scraped: int, secrets_count: int, errors_count: int):
+    log(f"Repos scraped: {repos_scraped} - Secrets: {secrets_count} - Errors: {errors_count} ", ActionType.INFO, LogLevel.STATS)
+
+
 
 def add_hits_entry(repo_name: str, branch: str, language: str, secrets: list[dict]):
-    with open(HITS_FILE, "r") as f:
-        data = json.load(f)
+    data = json.loads(HITS_FILE.read_text())
 
     log(f"[{repo_name}] Found {len(secrets)} Secret(s)", ActionType.SUCCESS, LogLevel.RESULTS)
 
@@ -116,8 +125,7 @@ def add_hits_entry(repo_name: str, branch: str, language: str, secrets: list[dic
 
 
 def add_secrets_entry(repo_name: str, branch: str, secrets: list[dict]):
-    with open(SECRETS_FILE, "r") as f:
-        data = json.load(f)
+    data = json.loads(SECRETS_FILE.read_text())
 
     for sec in secrets:
         path = sec["path"]
@@ -137,3 +145,8 @@ def add_secrets_entry(repo_name: str, branch: str, secrets: list[dict]):
 
     write_atomic(SECRETS_FILE, data)
 
+
+def add_stats_entry(entry: dict):
+    data = json.loads(STATS_FILE.read_text("utf-8"))
+    data.append(entry)
+    write_atomic(STATS_FILE, data)
