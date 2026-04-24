@@ -1,0 +1,15 @@
+FROM python:3.12-alpine
+
+WORKDIR /app
+
+COPY . .
+
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/app/.venv/bin:$PATH"
+
+RUN pip install -r requirements.txt
+
+
+EXPOSE 6767
+
+ENTRYPOINT ["python", "src/main.py"]
