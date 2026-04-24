@@ -10,11 +10,6 @@ from analysis import analyze_env_file
 
 TIMESTAMP_FOREGROUND_COLOR = Fore.WHITE
 
-# BASE = Path(__file__).parent.parent
-# DATA_DIR = BASE / "data"
-# HITS_FILE = DATA_DIR / "hits.json"
-# SECRETS_FILE = DATA_DIR / "secrets.json"
-
 DATA_DIR = Path("/app/data")
 HITS_FILE = DATA_DIR / "hits.json"
 SECRETS_FILE = DATA_DIR / "secrets.json"
