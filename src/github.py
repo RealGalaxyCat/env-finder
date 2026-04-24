@@ -1,5 +1,6 @@
 import os
 import requests
+from requests.exceptions import SSLError
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,7 +14,10 @@ HEADERS = {"Authorization": f"token {GITHUB_PAT}"}
 
 def search_repos(query: str, page: int = 1, per_page: int = 100):
     url = f"https://api.github.com/search/repositories?q={query}&page={page}&per_page={per_page}"
-    resp = requests.get(url, headers=HEADERS)
+    try:
+        resp = requests.get(url, headers=HEADERS)
+    except SSLError:
+        return []
     if not resp.ok:
         return []
 
@@ -22,14 +26,20 @@ def search_repos(query: str, page: int = 1, per_page: int = 100):
 
 
 def get_files(repo_name) -> list[dict]:
-    resp = requests.get(f"https://api.github.com/repos/{repo_name}", headers=HEADERS)
+    try:
+        resp = requests.get(f"https://api.github.com/repos/{repo_name}", headers=HEADERS)
+    except SSLError:
+        return []
     if not resp.ok:
         return []
 
     branch = resp.json().get("default_branch", "main")
 
     tree_url = f"https://api.github.com/repos/{repo_name}/git/trees/{branch}?recursive=1"
-    resp2 = requests.get(tree_url, headers=HEADERS)
+    try:
+        resp2 = requests.get(tree_url, headers=HEADERS)
+    except SSLError:
+        return []
     if not resp2.ok:
         return []
 
@@ -38,7 +48,10 @@ def get_files(repo_name) -> list[dict]:
 
 
 def get_file_content(repo_name: str, branch: str, filepath: str) -> str:
-    resp = requests.get(f"https://raw.githubusercontent.com/{repo_name}/refs/heads/{branch}/{filepath}")
+    try:
+        resp = requests.get(f"https://raw.githubusercontent.com/{repo_name}/refs/heads/{branch}/{filepath}")
+    except SSLError:
+        return ""
     if not resp.ok:
         return ""
     return resp.text
