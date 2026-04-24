@@ -12,9 +12,16 @@ def stats():
     pass
 
 
+@api.get("/stats/all")
+def stats_all():
+    pass
+
+
+
 @api.get("/hits")
 def hits():
     pass
+
 
 
 @api.get("/credentials")
