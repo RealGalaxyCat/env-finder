@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "env-finder"
+version = "1.0.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+dependencies = [
+    "python-dotenv",
+    "requests",
+    "colorama",
+    "fastapi",
+    "uvicorn",
+    "pydantic"
+]
+
+[tool.setuptools.packages.find]
+include = ["env_finder*"]
