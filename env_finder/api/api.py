@@ -17,7 +17,8 @@ start_time_ts = datetime.fromtimestamp(start_time_ms).strftime('%Y-%m-%d %H:%M:%
 def health():
     return Health(
         uptime_seconds = int(time.time() - start_time_ms),
-        up_since=start_time_ts
+        up_since_epoch_ms = start_time_ms,
+        up_since_utc=start_time_ts
     )
 
 
