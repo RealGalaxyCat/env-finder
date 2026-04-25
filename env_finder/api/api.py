@@ -4,11 +4,13 @@ app = FastAPI()
 api = APIRouter(prefix="/api")
 
 
-@api.get("/stats")
+@api.get("/health")
+def health():
+    pass
+
+
+@api.get("/stats/latest")
 def stats():
-    """
-    uptime: ...
-    """
     pass
 
 
@@ -18,13 +20,13 @@ def stats_all():
 
 
 
-@api.get("/hits")
+@api.get("/hits/all")
 def hits():
     pass
 
 
 
-@api.get("/credentials")
+@api.get("/secrets/all")
 def credentials():
     pass
 
