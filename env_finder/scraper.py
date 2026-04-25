@@ -33,12 +33,11 @@ class Scraper:
         while self.running:
             ts = time.time()
             add_stats_entry({
-                "timestamp": ts,
+                "timestamp_ms": ts,
                 "repos_scraped": self.repos_scraped,
                 "secrets_count": self.secrets_count,
                 "errors_count": self.errors_count
             })
-            print("Added stats entry")
             time.sleep(8)
 
 
