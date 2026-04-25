@@ -16,6 +16,8 @@ analysis.
 - [ ] Handle unsuccessful responses in github.py
 - [ ] Add retry logic for failed requests
 - [ ] Catch SSL Errors
+- [ ] Extend statistics for errors (like error type; SSLError, 4xx/5xx status code)
+- [ ] Rename 'url' to 'file_url' when logging to hits.json file
 
 ---
 
