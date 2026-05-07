@@ -4,7 +4,7 @@ import time
 import signal
 from threading import Thread
 
-from env_finder.github import get_files, search_repos
+from env_finder.github import get_files, search_repos, get_file_content
 from env_finder.util import log, log_stats, LogLevel, ActionType, add_hits_entry, add_secrets_entry, add_stats_entry
 
 
@@ -114,7 +114,7 @@ class Scraper:
                         if file["type"] == "tree": continue
                         if not file.get("size"): continue
 
-                        if ".env" in path and not "example" in path:
+                        if path.endswith(".env") and not "example" in path:
                             secrets.append(file)
 
 
@@ -127,7 +127,9 @@ class Scraper:
 
 
                     add_hits_entry(repo_name=name, branch=branch, language=language, secrets=secrets)
-                    add_secrets_entry(repo_name=name, branch=branch, secrets=secrets)
+                    for sec in secrets:
+                        path = sec["path"]
+                        add_secrets_entry(repo_name=name, branch=branch, path=path, file_content=get_file_content(name, branch, path))
 
 
             log_stats(self.repos_scraped, self.secrets_count, self.errors_count)

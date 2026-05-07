@@ -4,7 +4,6 @@ from enum import Enum
 from pathlib import Path
 from colorama import Fore, Back, Style
 
-from env_finder.github import get_file_content
 from env_finder.analysis import analyze_env_file
 
 
@@ -119,24 +118,20 @@ def add_hits_entry(repo_name: str, branch: str, language: str, secrets: list[dic
 
 
 
-def add_secrets_entry(repo_name: str, branch: str, secrets: list[dict]):
+def add_secrets_entry(repo_name: str, branch: str, path: str, file_content: str):
     data = json.loads(SECRETS_FILE.read_text())
+    env_vars = analyze_env_file(file_content)
 
-    for sec in secrets:
-        path = sec["path"]
+    for var in env_vars:
+        if var.get("severity") == "noise": continue
 
-        env_vars = analyze_env_file(get_file_content(repo_name, branch, path))
-
-        for var in env_vars:
-            if var.get("severity") == "noise": continue
-
-            data.append({
-                "repo_name": repo_name,
-                "url" : f"https://github.com/{repo_name}/blob/{branch}/{path}",
-                "severity" : var.get("severity"),
-                "key" : var.get("key"),
-                "value" : var.get("value")
-            })
+        data.append({
+            "repo_name": repo_name,
+            "url" : f"https://github.com/{repo_name}/blob/{branch}/{path}",
+            "severity" : var.get("severity"),
+            "key" : var.get("key"),
+            "value" : var.get("value")
+        })
 
     write_atomic(SECRETS_FILE, data)
 
