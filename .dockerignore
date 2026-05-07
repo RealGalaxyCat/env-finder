@@ -1,0 +1,5 @@
+*
+
+!env_finder/
+!requirements.txt
+!pyproject.toml
