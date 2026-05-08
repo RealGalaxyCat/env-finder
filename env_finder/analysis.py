@@ -6,14 +6,17 @@ critical_patterns = [
     re.compile(r"(API|KEY|SECRET|TOKEN)", re.IGNORECASE),
     re.compile(r"PASS(WORD)?$", re.IGNORECASE),
     re.compile(r"WEBHOOK", re.IGNORECASE),
-    re.compile(r"PRIVATE_KEY", re.IGNORECASE),
-    re.compile(r"MONGO.*_URI", re.IGNORECASE),
+    re.compile(r"PRIVATE", re.IGNORECASE),
+    re.compile(r"MONGO.*_UR(I|L)", re.IGNORECASE),
 ]
 
 sensitive_patterns = [
     re.compile(r"(SMTP|MAIL)_USER", re.IGNORECASE),
     re.compile(r"MAIL$", re.IGNORECASE),
     re.compile(r"CHAT_ID$", re.IGNORECASE),
+    re.compile(r"JWT", re.IGNORECASE),
+    re.compile(r"URL", re.IGNORECASE),
+    re.compile(r"PUBLIC", re.IGNORECASE)
 ]
 
 noise_patterns = [
@@ -26,7 +29,8 @@ noise_patterns = [
 
 value_noise_patterns = [
     re.compile(r"sample", re.IGNORECASE),
-    re.compile(r"your", re.IGNORECASE)
+    re.compile(r"your", re.IGNORECASE),
+    re.compile(r"(localhost|127.0.0.1)", re.IGNORECASE)
 ]
 
 
