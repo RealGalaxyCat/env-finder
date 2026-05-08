@@ -114,7 +114,8 @@ class Scraper:
                         if file["type"] == "tree": continue
                         if not file.get("size"): continue
 
-                        if path.endswith(".env") and not "example" in path:
+                        filename = path.rsplit("/", 1)[-1]
+                        if filename.endswith(".env") and not any(i in filename for i in ["example", "template", ".xcode"]):   # .xcode.env
                             secrets.append(file)
 
 
