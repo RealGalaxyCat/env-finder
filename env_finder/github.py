@@ -42,6 +42,7 @@ def search_repos(query: str, page: int = 1, per_page: int = 100):
     except SSLError:
         return []
     if not resp.ok:
+        log(resp.text, ActionType.ERROR, LogLevel.ERROR)
         return []
 
     return resp.json()
@@ -64,6 +65,7 @@ def get_files(repo_name) -> list[dict]:
     except SSLError:
         return []
     if not resp2.ok:
+        log(resp.text, ActionType.ERROR, LogLevel.ERROR)
         return []
 
     return resp2.json()["tree"]
@@ -76,6 +78,7 @@ def get_file_content(repo_name: str, branch: str, filepath: str) -> str:
     except SSLError:
         return ""
     if not resp.ok:
+        log(resp.text, ActionType.ERROR, LogLevel.ERROR)
         return ""
     return resp.text
 
