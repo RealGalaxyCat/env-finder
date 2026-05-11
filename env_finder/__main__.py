@@ -5,7 +5,7 @@ from threading import Thread
 from env_finder.api.api import app
 from env_finder.scraper import Scraper
 
-API_PORT = 6768
+API_PORT = 6767
 
 
 def start_api(app: FastAPI):
