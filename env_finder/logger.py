@@ -44,6 +44,7 @@ class ColorFormatter(logging.Formatter):
 def setup_logger(root_level, filename: str):
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
+    logging.getLogger("asyncio").setLevel(logging.WARNING)
 
     root = logging.getLogger()
     root.setLevel(root_level)
