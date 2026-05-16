@@ -46,7 +46,7 @@ def setup_logger(root_level, filename: str):
     root = logging.getLogger()
     root.setLevel(root_level)
 
-    fmt = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    fmt = "[%(asctime)s] [%(levelname)s] %(name)s: %(message)s"
 
     # handlers
     sh = StreamHandler(sys.stdout)
