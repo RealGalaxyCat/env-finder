@@ -29,10 +29,12 @@ noise_patterns = [
 ]
 
 value_noise_patterns = [
-    re.compile(r"sample", re.IGNORECASE),
+    re.compile(r"(sample|example)", re.IGNORECASE),
     re.compile(r"your", re.IGNORECASE),
+    re.compile(r"company.com", re.IGNORECASE),
     re.compile(r"(localhost|127.0.0.1)", re.IGNORECASE),
-    re.compile(r"(true|false)", re.IGNORECASE)
+    re.compile(r"(true|false)", re.IGNORECASE),
+    re.compile(r'^[xX]+$')   # only upper/lowercase 'x'
 ]
 
 
