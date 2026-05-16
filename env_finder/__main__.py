@@ -1,9 +1,15 @@
+import logging
+
 from fastapi import FastAPI
 import uvicorn
 from threading import Thread
 
 from env_finder.api.api import app
 from env_finder.scraper import Scraper
+from env_finder.logger import setup_logger
+
+setup_logger(logging.DEBUG, "logs.log")
+
 
 API_PORT = 6767
 
