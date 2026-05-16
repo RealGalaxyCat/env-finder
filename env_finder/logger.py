@@ -5,14 +5,14 @@ from logging import StreamHandler
 from logging.handlers import RotatingFileHandler
 
 
-SECRET_FOUND = 25  # between INFO (20) and WARNING (30)
-logging.addLevelName(SECRET_FOUND, "SECRET_FOUND")
+SECRET = 25  # between INFO (20) and WARNING (30)
+logging.addLevelName(SECRET, "SECRET")
 
 
 COLORS = {
     logging.DEBUG:    Fore.CYAN,
     logging.INFO:     Fore.GREEN,
-    SECRET_FOUND:     Back.YELLOW + Fore.WHITE,
+    SECRET:           Back.YELLOW + Fore.WHITE,
     logging.WARNING:  Fore.YELLOW,
     logging.ERROR:    Fore.RED,
     logging.CRITICAL: Fore.MAGENTA,
@@ -21,8 +21,8 @@ COLORS = {
 
 class AppLogger(logging.Logger):
     def secret(self, message, *args, **kwargs):
-        if self.isEnabledFor(SECRET_FOUND):
-            self._log(SECRET_FOUND, message, args, **kwargs)
+        if self.isEnabledFor(SECRET):
+            self._log(SECRET, message, args, **kwargs)
 
 
 # use CustomLogger for all new loggers
@@ -40,6 +40,9 @@ class ColorFormatter(logging.Formatter):
 
 
 def setup_logger(root_level, filename: str):
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.getLogger("requests").setLevel(logging.WARNING)
+
     root = logging.getLogger()
     root.setLevel(root_level)
 
