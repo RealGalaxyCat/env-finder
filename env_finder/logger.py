@@ -59,7 +59,7 @@ def setup_logger(root_level, filename: str):
         backupCount=3
     )
     fh.setFormatter(logging.Formatter(fmt))
-
+    fh.setLevel(SECRET)  # SECRET, WARNING, ERROR, CRITICAL
 
     root.addHandler(sh)
     root.addHandler(fh)
