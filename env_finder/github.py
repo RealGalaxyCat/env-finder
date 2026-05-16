@@ -41,8 +41,13 @@ def search_repos(query: str, page: int = 1, per_page: int = 100):
         resp = get_with_dns_retry(url)
     except SSLError:
         return []
+
     if not resp.ok:
-        log(resp.text, ActionType.ERROR, LogLevel.ERROR)
+        error = resp.json()
+        if error.get("status") == "401":
+            log("Invalid Github PAT (might be expired)", ActionType.ERROR, LogLevel.ERROR)
+        else:
+            log(resp.text, ActionType.ERROR, LogLevel.ERROR)
         return []
 
     return resp.json()
