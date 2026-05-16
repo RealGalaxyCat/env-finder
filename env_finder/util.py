@@ -1,13 +1,11 @@
 import json
-from datetime import datetime
-from enum import Enum
 from pathlib import Path
-from colorama import Fore, Back, Style
 
 from env_finder.analysis import analyze_env_file
+from env_finder.logger import getLogger
 
+logger = getLogger(__name__)
 
-TIMESTAMP_FOREGROUND_COLOR = Fore.WHITE
 
 DATA_DIR = Path("/app/data")
 HITS_FILE = DATA_DIR / "hits.json"
@@ -47,61 +45,17 @@ def write_atomic(path: Path, data: dict | list | str | bytes):
 
 
 
-RESET = Style.RESET_ALL
-
-
-class LogLevel(Enum):
-    INFO    = ("info",    Back.CYAN,    Fore.BLACK)
-    ERROR   = ("error",   Back.RED,     Fore.WHITE)
-    RESULTS = ("results", Back.YELLOW, Fore.WHITE)
-    STATS   = ("stats",   Back.GREEN,   Fore.BLACK)
-    STATUS  = ("status",  Back.BLUE,    Fore.WHITE)
-
-    def __init__(self, name_: str, background_color: str, foreground_color: str):
-        self.name_ = name_.upper()
-        self.bg_color = background_color
-        self.fg_color = foreground_color
-
-
-class ActionType(Enum):
-    SUCCESS = ("[+]", None,      Fore.GREEN)
-    ERROR   = ("[-]", Back.RED,  Fore.BLACK)
-    DEBUG   = ("[~]", None,      Fore.CYAN)
-    INFO    = ("[*]", None,      Fore.BLUE)
-    WARNING = ("[!]", None,      Fore.YELLOW)
-
-    def __init__(self, text: str, foreground_color: str, background_color: str):
-        self.text = text
-        self.fg = foreground_color
-        self.bg = background_color
-
-
-
-
-def log(message: str, at: ActionType, level: LogLevel = LogLevel.INFO, end="\n"):
-    ts = f"{TIMESTAMP_FOREGROUND_COLOR}[{datetime.now().strftime("%H:%M:%S")}]{Fore.RESET}"
-    if not at:
-        action_text = ""
-    else:
-        action_text = at.text
-
-    level_bg = level.bg_color if level.bg_color else ""
-    level_fg = level.fg_color if level.fg_color else ""
-    at_bg = at.bg if at.bg else ""
-    at_fg = at.fg if at.fg else ""
-    print(f"{ts} {level_bg}{level_fg}[{level.name_.ljust(7)}]{RESET} {at_bg}{at_fg}{action_text}{RESET} {message}", end=end)
-
-
-
 def log_stats(repos_scraped: int, secrets_count: int, errors_count: int):
-    log(f"Repos scraped: {repos_scraped} - Secrets: {secrets_count} - Errors: {errors_count} ", ActionType.INFO, LogLevel.STATS)
+    logger.info("# " + "~"*40 + " #")
+    logger.info(f"Repos scraped: {repos_scraped} - Secrets: {secrets_count} - Errors: {errors_count} ")
+    logger.info("# " + "~"*40 + " #")
 
 
 
 def add_hits_entry(repo_name: str, branch: str, language: str, secrets: list[dict]):
     data = json.loads(HITS_FILE.read_text())
 
-    log(f"[{repo_name}] Found {len(secrets)} Secret(s)", ActionType.SUCCESS, LogLevel.RESULTS)
+    logger.secret(f"[{repo_name}] Found {len(secrets)} Secret(s)")
 
     for sec in secrets:
         path = sec["path"]
