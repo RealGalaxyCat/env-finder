@@ -18,6 +18,7 @@ analysis.
 - [ ] Catch SSL Errors
 - [ ] Extend statistics for errors (like error type; SSLError, 4xx/5xx status code)
 - [ ] Rename 'url' to 'file_url' when logging to hits.json file
+- [ ] Add custom Log Level 'RESULTS' (Back.YELLOW, Fore.WHITE), 'STATS' (Back.GREEN, Fore.BLACK), and 'STATUS' (Back.BLUE, Fore.WHITE)
 
 ---
 
