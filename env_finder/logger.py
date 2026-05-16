@@ -1,4 +1,5 @@
 import sys
+import copy
 from colorama import Fore, Style, Back
 import logging
 from logging import StreamHandler
@@ -32,6 +33,7 @@ logging.setLoggerClass(AppLogger)
 
 class ColorFormatter(logging.Formatter):
     def format(self, record):
+        record = copy.copy(record)
         color = COLORS.get(record.levelno, "")
         record.levelname = f"{color}{record.levelname}{Style.RESET_ALL}"
         return super().format(record)
