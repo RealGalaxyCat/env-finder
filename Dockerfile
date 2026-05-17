@@ -12,4 +12,4 @@ RUN pip install -e .
 
 EXPOSE 6767
 
-ENTRYPOINT ["python", "env_finder/main.py"]
+ENTRYPOINT ["python", "-m", "env_finder"]

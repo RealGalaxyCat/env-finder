@@ -2,15 +2,18 @@ import os
 import time
 import requests
 from requests.exceptions import SSLError
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 load_dotenv()
 
-from env_finder.util import log, LogLevel, ActionType
+from env_finder.logger import getLogger
+
+logger = getLogger(__name__)
 
 
 GITHUB_PAT = os.getenv("GITHUB_PAT")
 if not GITHUB_PAT:
+    logger.error("'GITHUB_PAT' is not set.")
     raise ValueError("'GITHUB_PAT' is not set.")
 
 HEADERS = {"Authorization": f"token {GITHUB_PAT}"}
@@ -29,7 +32,7 @@ def get_with_dns_retry(url: str, *, retries=5, **kwargs) -> requests.Response | 
             if attempt == retries - 1:
                 raise
             wait = 2 ** attempt  # 1s, 2s, 4s, 8s
-            log(f"DNS/connection error (attempt {attempt + 1}), retrying in {wait}s: {e}", ActionType.ERROR, LogLevel.ERROR)
+            logger.error(f"DNS/connection error (attempt {attempt + 1}), retrying in {wait}s: {e}")
             time.sleep(wait)
 
 
@@ -41,7 +44,13 @@ def search_repos(query: str, page: int = 1, per_page: int = 100):
         resp = get_with_dns_retry(url)
     except SSLError:
         return []
+
     if not resp.ok:
+        error = resp.json()
+        if error.get("status") == "401":
+            logger.error("Invalid Github PAT (might be expired)")
+        else:
+            logger.error(resp.text)
         return []
 
     return resp.json()
@@ -64,6 +73,7 @@ def get_files(repo_name) -> list[dict]:
     except SSLError:
         return []
     if not resp2.ok:
+        logger.error(resp.text)
         return []
 
     return resp2.json()["tree"]
@@ -76,6 +86,7 @@ def get_file_content(repo_name: str, branch: str, filepath: str) -> str:
     except SSLError:
         return ""
     if not resp.ok:
+        logger.error(resp.text)
         return ""
     return resp.text
 

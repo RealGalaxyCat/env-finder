@@ -5,22 +5,35 @@ critical_patterns = [
     re.compile(r"(API|KEY|SECRET|TOKEN)", re.IGNORECASE),
     re.compile(r"PASS(WORD)?$", re.IGNORECASE),
     re.compile(r"WEBHOOK", re.IGNORECASE),
-    re.compile(r"PRIVATE_KEY", re.IGNORECASE),
-    re.compile(r"MONGO.*_URI", re.IGNORECASE),
+    re.compile(r"PRIVATE", re.IGNORECASE),
+    re.compile(r"MONGO.*_UR(I|L)", re.IGNORECASE),
+    re.compile(r"BINANCE", re.IGNORECASE),
 ]
 
 sensitive_patterns = [
     re.compile(r"(SMTP|MAIL)_USER", re.IGNORECASE),
     re.compile(r"MAIL$", re.IGNORECASE),
     re.compile(r"CHAT_ID$", re.IGNORECASE),
+    re.compile(r"JWT", re.IGNORECASE),
+    re.compile(r"URL", re.IGNORECASE),
+    re.compile(r"PUBLIC", re.IGNORECASE)
 ]
 
 noise_patterns = [
     # re.compile(r"^VITE.*", re.IGNORECASE),
-    re.compile(r"^NODE.*", re.IGNORECASE),
-    re.compile(r".*PORT$", re.IGNORECASE),
-    re.compile(r".*HOST$", re.IGNORECASE),
-    re.compile(r" *", re.IGNORECASE)
+    re.compile(r"^NODE", re.IGNORECASE),
+    re.compile(r"PORT$", re.IGNORECASE),
+    re.compile(r"HOST$", re.IGNORECASE),
+    re.compile(r"^\s*$")  # empty/whitespace-only strings
+]
+
+value_noise_patterns = [
+    re.compile(r"(sample|example)", re.IGNORECASE),
+    re.compile(r"your", re.IGNORECASE),
+    re.compile(r"company.com", re.IGNORECASE),
+    re.compile(r"(localhost|127.0.0.1)", re.IGNORECASE),
+    re.compile(r"(true|false)", re.IGNORECASE),
+    re.compile(r'^[xX]+$')   # only upper/lowercase 'x'
 ]
 
 

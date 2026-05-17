@@ -1,0 +1,10 @@
+services:
+    scraper:
+        image: env-finder:1.0
+        ports:
+            - "6767:6767"
+        volumes:
+            - ./data:/app/data
+            - ./logs:/app/logs
+        env_file:
+            - .env
