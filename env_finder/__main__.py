@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from fastapi import FastAPI
 import uvicorn
@@ -6,22 +7,24 @@ from threading import Thread
 
 from env_finder.api.api import app
 from env_finder.scraper import Scraper
-from env_finder.logger import setup_logger
+from env_finder.logger import setup_logger, getLogger
+from env_finder.errors import GithubAuthError
 
 setup_logger(logging.DEBUG, "logs.log")
-
-
-API_PORT = 6767
+logger = getLogger(__name__)
 
 
 def start_api(app: FastAPI):
-    uvicorn.run(app, host="0.0.0.0", port=API_PORT)
+    uvicorn.run(app, host="0.0.0.0", port=6767)
 
 
 def start_scraper():
-    s = Scraper()
-    s.start()
-
+    try:
+        s = Scraper()
+        s.start()
+    except GithubAuthError as e:
+        logger.fatal(e)
+        sys.exit(1)
 
 
 Thread(target=start_api, args=(app,)).start()
