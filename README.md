@@ -6,22 +6,6 @@ analysis.
 
 ---
 
-## Todo
-
-- [x] Replace logging System with stdlib logging module
-- [x] Improve Log Messages
-- [ ] Implement logic to filter out known default .env files using hash blacklist
-- [ ] Add more hashes for default .env files
-- [ ] Add type hints in github.py
-- [ ] Handle unsuccessful responses in github.py
-- [ ] Add retry logic for failed requests
-- [x] Catch SSL Errors
-- [ ] Extend statistics for errors (like error type; SSLError, 4xx/5xx status code)
-- [ ] Rename 'url' to 'file_url' when logging to hits.json file
-- [ ] Add custom Log Level 'RESULTS' (Back.YELLOW, Fore.WHITE), 'STATS' (Back.GREEN, Fore.BLACK), and 'STATUS' (Back.BLUE, Fore.WHITE)
-
----
-
 ## Responsible Use
 
 This tool is intended for ethical security research and defensive analysis only.
