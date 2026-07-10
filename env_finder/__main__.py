@@ -1,3 +1,4 @@
+import sys
 import logging
 from fastapi import FastAPI
 import uvicorn
@@ -23,5 +24,6 @@ def start_scraper():
     except GithubAuthError as e:
         logger.fatal(e)
         sys.exit(1)
+
 Thread(target=start_api, args=(app,)).start()
 start_scraper()  # needs to run in main Thread so it can handle SIGINT/SIGTERM
