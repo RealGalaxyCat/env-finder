@@ -5,7 +5,7 @@ import signal
 from threading import Thread
 
 from env_finder.github import get_files, search_repos, get_file_content
-from env_finder.util import log_stats, add_hits_entry, add_secrets_entry, add_stats_entry
+from env_finder.util import log_stats, add_hits_entry, add_secrets_entry, heartbeat
 from env_finder.logger import getLogger
 
 logger = getLogger(__name__)
@@ -15,12 +15,15 @@ REPO_BATCH_SIZE = 100
 
 class Scraper:
     def __init__(self):
-        self.repos_scraped = 0
-        self.secret_files_count = 0
-        # self.secrets_count = 0
-        self.errors_count = 0
-        self.running = False
+        self.start_time_ms = None
+        self.start_time_ts = None
 
+        self.repos_scraped = 0
+        self.env_files_found = 0
+        # self.secrets_found = 0
+        self.errors_count = 0
+
+        self.running = False
         self.seen_repos = set()
 
         signal.signal(signal.SIGTERM, self.handle_stop_signals)
@@ -35,17 +38,21 @@ class Scraper:
     def stats_loop(self):
         while self.running:
             ts = time.time()
-            add_stats_entry({
-                "timestamp_ms": ts,
-                "repos_scraped": self.repos_scraped,
-                "secret_files_count": self.secret_files_count,
-                "errors_count": self.errors_count
-            })
-            log_stats(self.repos_scraped, self.secret_files_count, self.errors_count)
+            heartbeat(
+                timestamp=ts,
+                up_since_epoch_ms=self.start_time_ms,
+                repos_scraped=self.repos_scraped,
+                env_files_found=self.env_files_found,
+                errors=self.errors_count
+            )
+            log_stats(self.repos_scraped, self.env_files_found, self.errors_count)
             time.sleep(8)
 
 
     def start(self):
+        self.start_time_ms = time.time()
+        self.start_time_ts = datetime.fromtimestamp(self.start_time_ms).strftime('%Y-%m-%d %H:%M:%S')
+
         self.running = True
         Thread(target=self.stats_loop).start()
 
@@ -67,7 +74,7 @@ class Scraper:
 
             repos = search_repos(query, per_page=1)  # only 1, because we don't care about the actual repos just yet
             if not repos:
-                log_stats(self.repos_scraped, self.secret_files_count, self.errors_count)
+                log_stats(self.repos_scraped, self.env_files_found, self.errors_count)
                 break
 
             count = len(repos)
@@ -105,7 +112,7 @@ class Scraper:
                         time.sleep(5)
                         continue
 
-                    secret_files = []
+                    env_files = []
                     for file in files:
                         path = file["path"]
 
@@ -114,19 +121,19 @@ class Scraper:
 
                         filename = path.rsplit("/", 1)[-1]
                         if filename.endswith(".env") and not any(i in filename for i in ["example", "template", ".xcode"]):   # .xcode.env
-                            secret_files.append(file)
+                            env_files.append(file)
 
 
                     self.repos_scraped += 1
-                    self.secret_files_count += len(secret_files)
+                    self.env_files_found += len(env_files)
 
-                    if not secret_files:
+                    if not env_files:
                         logger.info(f"[{name}] No env files found")
                         continue
 
 
-                    add_hits_entry(repo_name=name, branch=branch, language=language, secrets=secret_files)
-                    for sec in secret_files:
+                    add_hits_entry(repo_name=name, branch=branch, language=language, secrets=env_files)
+                    for sec in env_files:
                         path = sec["path"]
                         file_content = get_file_content(name, branch, path)
                         if file_content:

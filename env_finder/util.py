@@ -10,7 +10,7 @@ logger = getLogger(__name__)
 DATA_DIR = Path("/app/data")
 HITS_FILE = DATA_DIR / "hits.json"
 SECRETS_FILE = DATA_DIR / "secrets.json"
-STATS_FILE = DATA_DIR / "stats.json"
+HEALTH_FILE = DATA_DIR / "health.json"
 
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -24,10 +24,9 @@ if not SECRETS_FILE.exists():
     SECRETS_FILE.touch()
     SECRETS_FILE.write_text("[]", encoding="utf-8")
 
-if not STATS_FILE.exists():
+if not HEALTH_FILE.exists():
     print("Stats file doesn't exist, creating...")
-    STATS_FILE.touch()
-    STATS_FILE.write_text("[]", encoding="utf-8")
+    HEALTH_FILE.touch()
 
 
 
@@ -90,7 +89,13 @@ def add_secrets_entry(repo_name: str, branch: str, path: str, file_content: str)
     write_atomic(SECRETS_FILE, data)
 
 
-def add_stats_entry(entry: dict):
-    data = json.loads(STATS_FILE.read_text("utf-8"))
-    data.append(entry)
-    write_atomic(STATS_FILE, data)
+def heartbeat(timestamp: float, up_since_epoch_ms: float, repos_scraped: int, errors: int, env_files_found: int):
+    HEALTH_FILE.write_text(json.dumps({
+        "timestamp": timestamp,
+        "up_since": up_since_epoch_ms,
+        "stats" : {
+            "repos_scraped": repos_scraped,
+            "errors": errors,
+            "env_files_found": env_files_found
+        }
+    }), encoding="utf-8")
