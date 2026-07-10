@@ -96,9 +96,9 @@ def search_repos(query: str, page: int = 1, per_page: int = 100) -> list[dict] |
 def get_files(repo_name) -> list[dict] | None:
     try:
         resp = get(f"https://api.github.com/repos/{repo_name}")
+        if not resp.ok:
+            return None
     except ConnectionError:
-        return None
-    if not resp.ok:
         return None
 
     branch = resp.json().get("default_branch", "main")
