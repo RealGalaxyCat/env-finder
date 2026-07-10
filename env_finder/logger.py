@@ -1,6 +1,7 @@
 import sys
 import copy
 import datetime
+from pathlib import Path
 from colorama import Fore, Style, Back
 import logging
 from logging import StreamHandler
@@ -61,6 +62,9 @@ def setup_logger(root_level, filename: str):
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
     logging.getLogger("asyncio").setLevel(logging.WARNING)
+
+    # Create log directory
+    Path("/app/logs").mkdir(parents=True, exist_ok=True)
 
     root = logging.getLogger()
     root.setLevel(root_level)
