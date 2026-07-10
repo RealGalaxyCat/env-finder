@@ -1,5 +1,8 @@
 services:
     scraper:
+        build:
+            dockerfile: Dockerfile
+            context: .
         image: env-finder:1.0
         ports:
             - "6767:6767"
