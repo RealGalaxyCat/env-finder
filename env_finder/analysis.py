@@ -33,7 +33,8 @@ value_noise_patterns = [
     re.compile(r"company.com", re.IGNORECASE),
     re.compile(r"(localhost|127.0.0.1)", re.IGNORECASE),
     re.compile(r"(true|false)", re.IGNORECASE),
-    re.compile(r'^[xX]+$')   # only upper/lowercase 'x'
+    re.compile(r"^[xX]+$"),   # only upper/lowercase 'x'
+    re.compile(r"^\s*$")  # empty/whitespace-only strings
 ]
 
 
@@ -65,7 +66,7 @@ def analyze_env_file(content: str):
 
     result = []
 
-    for line in content.splitlines():
+    for line in lines:
         line = line.strip()
 
         if not line: continue
