@@ -45,9 +45,9 @@ def write_atomic(path: Path, data: dict | list | str | bytes):
 
 
 
-def log_stats(repos_scraped: int, secrets_count: int, errors_count: int):
+def log_stats(repos_scraped: int, secret_files_count: int, errors_count: int):
     logger.info("# " + "~"*40 + " #")
-    logger.info(f"Repos scraped: {repos_scraped} - Secrets: {secrets_count} - Errors: {errors_count} ")
+    logger.info(f"Repos scraped: {repos_scraped} - Secrets files: {secret_files_count} - Errors: {errors_count} ")
     logger.info("# " + "~"*40 + " #")
 
 
