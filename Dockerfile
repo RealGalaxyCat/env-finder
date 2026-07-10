@@ -5,7 +5,6 @@ WORKDIR /app
 COPY . .
 
 ENV PYTHONUNBUFFERED=1
-ENV PATH="/app/.venv/bin:$PATH"
 
 RUN pip install -r requirements.txt
 RUN pip install -e .
