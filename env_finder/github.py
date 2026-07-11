@@ -84,7 +84,9 @@ def search_repos(query: str, page: int = 1, per_page: int = 100) -> list[dict] |
         resp = get(url)
     except ConnectionError as e:
         logger.error(f"Error while searching for repos: {e}")
-        return {}
+        return None
+    if not resp or not resp.ok:
+        return None
 
     d = resp.json()
     count = d.get("total_count")
@@ -96,9 +98,9 @@ def search_repos(query: str, page: int = 1, per_page: int = 100) -> list[dict] |
 def get_files(repo_name) -> list[dict] | None:
     try:
         resp = get(f"https://api.github.com/repos/{repo_name}")
-        if not resp.ok:
-            return None
     except ConnectionError:
+        return None
+    if not resp or not resp.ok:
         return None
 
     branch = resp.json().get("default_branch", "main")
@@ -108,7 +110,7 @@ def get_files(repo_name) -> list[dict] | None:
         resp2 = get(tree_url)
     except ConnectionError:
         return None
-    if not resp2.ok:
+    if not resp2 or not resp2.ok:
         logger.error(resp.text)
         return None
 
@@ -121,7 +123,7 @@ def get_file_content(repo_name: str, branch: str, filepath: str) -> str | None:
         resp = get(f"https://raw.githubusercontent.com/{repo_name}/refs/heads/{branch}/{filepath}")
     except ConnectionError:
         return None
-    if not resp.ok:
+    if not resp or not resp.ok:
         logger.error(resp.text)
         return None
     return resp.text
