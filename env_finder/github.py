@@ -1,3 +1,6 @@
+from env_finder.logger import getLogger
+from env_finder.errors import GithubAuthError
+
 import os
 import time
 import requests
@@ -5,9 +8,6 @@ from requests.exceptions import SSLError
 
 from dotenv import load_dotenv
 load_dotenv()
-
-from env_finder.logger import getLogger
-from env_finder.errors import GithubAuthError
 
 logger = getLogger(__name__)
 
