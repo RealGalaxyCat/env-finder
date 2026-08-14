@@ -64,7 +64,7 @@ def setup_logger(root_level, filename: str):
     logging.getLogger("asyncio").setLevel(logging.WARNING)
 
     # Create log directory
-    Path("/app/logs").mkdir(parents=True, exist_ok=True)
+    Path("/data/logs").mkdir(parents=True, exist_ok=True)
 
     root = logging.getLogger()
     root.setLevel(root_level)
@@ -77,7 +77,7 @@ def setup_logger(root_level, filename: str):
     sh.setFormatter(ColorFormatter(fmt_console))
 
     fh = RotatingFileHandler(
-        f"/app/logs/{filename}",
+        f"/data/logs/{filename}",
         mode="a",
         maxBytes=5 * 1024 * 1024,  # 5mb
         backupCount=3

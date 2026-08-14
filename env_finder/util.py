@@ -7,7 +7,7 @@ from env_finder.logger import getLogger
 logger = getLogger(__name__)
 
 
-DATA_DIR = Path("/app/data")
+DATA_DIR = Path("/data")
 HITS_FILE = DATA_DIR / "hits.json"
 SECRETS_FILE = DATA_DIR / "secrets.json"
 HEALTH_FILE = DATA_DIR / "health.json"

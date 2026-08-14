@@ -7,7 +7,6 @@ services:
         ports:
             - "6767:6767"
         volumes:
-            - ./data:/app/data
-            - ./logs:/app/logs
+            - ./data:/data
         env_file:
             - .env
