@@ -76,7 +76,8 @@ def add_secrets_entry(repo_name: str, branch: str, path: str, file_content: str)
     env_vars = analyze_env_file(file_content)
 
     for var in env_vars:
-        if var.get("severity") == "noise": continue
+        if var.get("severity") == "noise":
+            continue
 
         data.append({
             "repo_name": repo_name,
