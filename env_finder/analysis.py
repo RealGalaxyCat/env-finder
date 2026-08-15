@@ -67,23 +67,15 @@ def analyze_env_file(content: str):
     result = []
 
     for line in lines:
-        line = line.strip()
-
-        if not line or line.startswith("#") or "=" not in line:
-            continue
 
         k, v = line.split("=", 1)
-
-        k = k.strip().upper()
-        v = v.strip()
-
         if not v:
             continue
 
         result.append({
             "severity": classify_env_key(k),
-            "key": k,
-            "value": v
+            "key": k.strip(),
+            "value": v.strip()
         })
 
     return result

@@ -1,5 +1,0 @@
-
-
-class GithubAuthError(Exception):
-    pass
-

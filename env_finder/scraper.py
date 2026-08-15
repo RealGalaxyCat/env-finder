@@ -4,6 +4,7 @@ import time
 import signal
 from threading import Thread
 
+from env_finder.config import get_config
 from env_finder.github import get_files, search_repos, get_file_content
 from env_finder.util import log_stats, add_hits_entry, add_secrets_entry, heartbeat
 from env_finder.logger import getLogger
@@ -71,7 +72,6 @@ class Scraper:
             logger.info(f"[GITHUB] Querying '{query}'")
 
 
-
             repos = search_repos(query, per_page=1)  # only 1, because we don't care about the actual repos just yet
             if not repos:
                 log_stats(self.repos_scraped, self.env_files_found, self.errors_count)
@@ -96,7 +96,6 @@ class Scraper:
 
                     if name in self.seen_repos:
                         logger.debug(f"[{name}] Repo was already searched, skipping")
-                        time.sleep(0.3)
                         continue
 
                     self.seen_repos.add(name)
@@ -109,7 +108,7 @@ class Scraper:
                     if not files:
                         logger.error(f"[{name}] Failed to fetch Files")
                         self.errors_count += 1
-                        time.sleep(5)
+                        time.sleep(get_config().error_delay)
                         continue
 
                     env_files = []

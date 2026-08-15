@@ -4,9 +4,26 @@ services:
             dockerfile: Dockerfile
             context: .
         image: env-finder:1.0
-        ports:
-            - "6767:6767"
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD", "curl", "-fsS", "http://localhost:6767/api/health"]
+            interval: 10s
+            timeout: 3s
+            retries: 3
+            start_period: 10s
+
+        # By default, env-finder's API is only accessible through the docker network 'env-finder-internal'.
+        # If another dockerized service should have access to env-finder's API, add the service to the 'env-finder-internal' network.
+        # If you need to access the API directly from the host, uncomment the line 'ports'.
+        expose: ["6767"]   # documentation purposes only
+        # ports: ["127.0.0.1:6767:6767"]
+        networks: [env-finder-internal]
         volumes:
             - ./data:/data
         env_file:
             - .env
+
+
+networks:
+    env-finder-internal:
+        name: env-finder-internal
