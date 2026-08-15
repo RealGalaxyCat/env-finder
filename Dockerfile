@@ -4,6 +4,8 @@ WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1
 
+RUN apk add --no-cache curl
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -15,4 +17,4 @@ RUN pip install -e .
 
 EXPOSE 6767
 
-ENTRYPOINT ["python", "-m", "env_finder"]
+CMD ["python", "-m", "env_finder"]
