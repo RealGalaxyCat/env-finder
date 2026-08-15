@@ -1,7 +1,6 @@
 from env_finder.logger import getLogger
-from env_finder.errors import GithubAuthError
+from env_finder.config import get_config
 
-import os
 import time
 import requests
 from requests.exceptions import SSLError
@@ -12,22 +11,13 @@ load_dotenv()
 logger = getLogger(__name__)
 
 
-GITHUB_PAT = os.getenv("GITHUB_PAT")
-if not GITHUB_PAT:
-    raise GithubAuthError("Missing Github PAT (check 'GITHUB_PAT' env variable)")
-
-HEADERS = {"Authorization": f"token {GITHUB_PAT}"}
-
-
-
-
 def get(url: str, *, retries=5, **kwargs) -> requests.Response | None:
     """
     Sends an HTTP request and handles retries when encountering a DNS resolution error (using exponential backoff) as well as Rate Limits.
     """
     for attempt in range(retries):
         try:
-            resp = requests.get(url, headers=HEADERS, **kwargs)
+            resp = requests.get(url, headers={"Authorization": f"token {get_config().github_pat}"}, **kwargs)
 
 
             # Handle Rate Limits
@@ -50,7 +40,7 @@ def get(url: str, *, retries=5, **kwargs) -> requests.Response | None:
                     continue
 
             if resp.status_code == 401:
-                raise GithubAuthError("Invalid Github PAT (might be expired)")
+                raise RuntimeError("Invalid Github PAT (might be expired)")
 
             if not resp.ok:
                 logger.error(resp.text)

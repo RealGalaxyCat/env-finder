@@ -4,3 +4,4 @@ colorama
 fastapi
 uvicorn
 pydantic
+pydantic-settings
