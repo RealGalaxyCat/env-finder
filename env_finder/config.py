@@ -14,7 +14,7 @@ class Config(BaseSettings):
     def pat_is_set(cls, v: str):
         if not v:
             raise ValueError("A Github PAT is required for this program to work. Add it to .env as 'GITHUB_PAT'")
-
+        return v
 
 
 @lru_cache
