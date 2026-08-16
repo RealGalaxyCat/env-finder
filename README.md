@@ -1,3 +1,5 @@
+<img src="assets/env-finder.png" width="900" alt="env-finder logo">
+
 # EnvFinder
 
 EnvFinder is a security research tool that helps identify accidentally exposed configuration
