@@ -30,7 +30,7 @@ if not HEALTH_FILE.exists():
 
 
 
-def write_atomic(path: Path, data: dict | list | str | bytes):
+async def write_atomic(path: Path, data: dict | list | str | bytes):
     tmp = path.with_suffix(".tmp")
     match data:
         case dict() | list():
@@ -51,7 +51,7 @@ def log_stats(repos_scraped: int, secret_files_count: int, errors_count: int):
 
 
 
-def add_hits_entry(repo_name: str, branch: str, language: str, secrets: list[dict]):
+async def add_hits_entry(repo_name: str, branch: str, language: str, secrets: list[dict]):
     data = json.loads(HITS_FILE.read_text())
 
     logger.secret(f"[{repo_name}] Found {len(secrets)} Secret(s)")
@@ -67,11 +67,11 @@ def add_hits_entry(repo_name: str, branch: str, language: str, secrets: list[dic
             "sha" : sec["sha"]
         })
 
-    write_atomic(HITS_FILE, data)
+    await write_atomic(HITS_FILE, data)
 
 
 
-def add_secrets_entry(repo_name: str, branch: str, path: str, file_content: str):
+async def add_secrets_entry(repo_name: str, branch: str, path: str, file_content: str):
     data = json.loads(SECRETS_FILE.read_text())
     env_vars = analyze_env_file(file_content)
 
@@ -87,16 +87,20 @@ def add_secrets_entry(repo_name: str, branch: str, path: str, file_content: str)
             "value" : var.get("value")
         })
 
-    write_atomic(SECRETS_FILE, data)
+    await write_atomic(SECRETS_FILE, data)
 
 
-def heartbeat(timestamp: float, up_since_epoch_ms: float, repos_scraped: int, errors: int, env_files_found: int):
-    HEALTH_FILE.write_text(json.dumps({
-        "timestamp": timestamp,
-        "up_since": up_since_epoch_ms,
-        "stats" : {
-            "repos_scraped": repos_scraped,
-            "errors": errors,
-            "env_files_found": env_files_found
+async def heartbeat(timestamp: float, up_since_epoch_ms: float, repos_scraped: int, errors: int, env_files_found: int):
+    await write_atomic(
+        HEALTH_FILE,
+        {
+            "timestamp": timestamp,
+            "up_since": up_since_epoch_ms,
+            "stats": {
+                "repos_scraped": repos_scraped,
+                "errors": errors,
+                "env_files_found": env_files_found
+            }
         }
-    }), encoding="utf-8")
+    )
+

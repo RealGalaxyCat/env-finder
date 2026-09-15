@@ -6,14 +6,13 @@ api = APIRouter(prefix="/api")
 
 
 
-@api.get("/health", status_code=200)
-def health():
-    return "API is healthy"
+@api.get("/health", status_code=204)
+async def health(): ...
 
 
 
 @api.get("/stats")
-def stats():
+async def stats():
     pass
 
 

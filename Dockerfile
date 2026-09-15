@@ -4,7 +4,6 @@ WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1
 
-RUN apk add --no-cache curl
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
