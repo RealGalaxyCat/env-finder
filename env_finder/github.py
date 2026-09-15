@@ -2,9 +2,10 @@ import logging
 from env_finder.logger import getLogger
 from env_finder.config import get_config
 
+import ssl
 import time
 import httpx
-from requests.exceptions import SSLError
+import asyncio
 
 from dotenv import load_dotenv
 load_dotenv()
