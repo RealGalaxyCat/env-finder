@@ -7,12 +7,12 @@ api = APIRouter(prefix="/api")
 
 
 @api.get("/health", status_code=204)
-def health(): ...
+async def health(): ...
 
 
 
 @api.get("/stats")
-def stats():
+async def stats():
     pass
 
 

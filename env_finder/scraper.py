@@ -1,8 +1,8 @@
+import asyncio
 from datetime import datetime, timezone, timedelta
 from math import ceil
 import time
 import signal
-from threading import Thread
 
 from env_finder.config import get_config
 from env_finder.github import get_files, search_repos, get_file_content
@@ -36,10 +36,10 @@ class Scraper:
         logger.info("Received shutdown signal, shutting down...")
 
 
-    def stats_loop(self):
+    async def stats_loop(self):
         while self.running:
             ts = time.time()
-            heartbeat(
+            await heartbeat(
                 timestamp=ts,
                 up_since_epoch_ms=self.start_time_ms,
                 repos_scraped=self.repos_scraped,
@@ -47,17 +47,19 @@ class Scraper:
                 errors=self.errors_count
             )
             log_stats(self.repos_scraped, self.env_files_found, self.errors_count)
-            time.sleep(8)
+            await asyncio.sleep(8)
 
 
-    def start(self):
+    async def start(self):
         self.start_time_ms = time.time()
         self.start_time_ts = datetime.fromtimestamp(self.start_time_ms).strftime('%Y-%m-%d %H:%M:%S')
 
         self.running = True
-        Thread(target=self.stats_loop).start()
+        asyncio.create_task(self.stats_loop())
 
         while self.running:
+            await asyncio.sleep(0)
+
             now = datetime.now(timezone.utc)
 
             to = now - timedelta(minutes=1)
@@ -72,7 +74,7 @@ class Scraper:
             logger.info(f"[GITHUB] Querying '{query}'")
 
 
-            repos = search_repos(query, per_page=1)  # only 1, because we don't care about the actual repos just yet
+            repos = await search_repos(query, per_page=1)  # only 1, because we don't care about the actual repos just yet
             if not repos:
                 log_stats(self.repos_scraped, self.env_files_found, self.errors_count)
                 break
@@ -84,7 +86,7 @@ class Scraper:
                     break
 
                 logger.info(f"[GITHUB] Loading Page {p}/{ceil(count/REPO_BATCH_SIZE)}")
-                repos = search_repos(query, p, REPO_BATCH_SIZE)
+                repos = await search_repos(query, p, REPO_BATCH_SIZE)
 
                 for repo in repos:
                     if not self.running:
@@ -99,16 +101,16 @@ class Scraper:
                         continue
 
                     self.seen_repos.add(name)
-                    time.sleep(0.5)
+                    await asyncio.sleep(0.5)
 
 
                     logger.info(f"[{name}] Scraping ...  ".ljust(70))
 
-                    files = get_files(name)
+                    files = await get_files(name)
                     if not files:
                         logger.error(f"[{name}] Failed to fetch Files")
                         self.errors_count += 1
-                        time.sleep(get_config().error_delay)
+                        await asyncio.sleep(get_config().error_delay)
                         continue
 
                     env_files = []
@@ -133,11 +135,11 @@ class Scraper:
                         continue
 
 
-                    add_hits_entry(repo_name=name, branch=branch, language=language, secrets=env_files)
+                    await add_hits_entry(repo_name=name, branch=branch, language=language, secrets=env_files)
                     for sec in env_files:
                         path = sec["path"]
-                        file_content = get_file_content(name, branch, path)
+                        file_content = await get_file_content(name, branch, path)
                         if file_content:
-                            add_secrets_entry(repo_name=name, branch=branch, path=path, file_content=file_content)
+                            await add_secrets_entry(repo_name=name, branch=branch, path=path, file_content=file_content)
 
 
